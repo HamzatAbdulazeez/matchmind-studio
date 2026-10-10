@@ -4,11 +4,11 @@ import { computeState } from "@/lib/engine/analysis";
 import { askJSON } from "@/lib/ai/client";
 import { buildContext } from "@/lib/ai/context";
 import { recapSystem } from "@/lib/ai/prompts";
+import { parseProfile, toPersonalization } from "@/lib/ai/profile";
 import { fallbackRecap } from "@/lib/ai/fallback";
 import { isLanguage, isRecapStyle, TRANSLATOR_PREFERRED } from "@/lib/ai/options";
 import { translate, translatorEnabled } from "@/lib/ai/translator";
 import type { Recap } from "@/types/ai";
-import type { TeamSide } from "@/types/match";
 
 export const dynamic = "force-dynamic";
 
@@ -16,20 +16,21 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const style = isRecapStyle(body.style) ? body.style : "tv";
   const language = isLanguage(body.language) ? body.language : "English";
-  const focus: TeamSide | undefined = body.focusTeam === "home" || body.focusTeam === "away" ? body.focusTeam : undefined;
   const minute = Number(body.minute) || 90;
 
   const match = await loadMatch();
   const played = match.events.filter((e) => e.minute <= minute);
   const state = computeState(match, played);
+  const profile = parseProfile(body, match);
 
+  // For Yoruba, Hausa, Igbo and Swahili: write in English, then translate with Azure AI Translator
   const useTranslator = translatorEnabled() && TRANSLATOR_PREFERRED.includes(language);
   const writeIn = useTranslator ? "English" : language;
 
   try {
     const result = await askJSON<Omit<Recap, "source">>(
-      recapSystem(style, writeIn, focus ? match[focus].name : undefined),
-      buildContext(match, state, played),
+      recapSystem(style, writeIn, toPersonalization(profile, match)),
+      buildContext(match, state, played, profile.playerId),
       0.7,
     );
     if (result?.body) {

@@ -1,7 +1,7 @@
 export type TeamSide = "home" | "away";
 
 export type EventType =
-  | "kickoff" | "pass" | "tackle" | "interception"
+  | "kickoff" | "pass" | "tackle" | "interception" | "possession_change" | "pressure" | "sprint"
   | "shot" | "shot_on_target" | "goal" | "save"
   | "foul" | "yellow_card" | "red_card" | "corner"
   | "offside" | "substitution" | "half_time" | "full_time";
@@ -13,6 +13,7 @@ export interface Player {
   name: string;
   number: number;
   position: Position;
+  workRate: number; 
 }
 
 export interface Team {
@@ -20,7 +21,7 @@ export interface Team {
   name: string;
   shortName: string;
   side: TeamSide;
-  players: Player[]; // first 11 = starters, rest = bench
+  players: Player[]; 
 }
 
 export interface MatchEvent {
@@ -35,6 +36,9 @@ export interface MatchEvent {
   y?: number; 
   xG?: number;
   outcome?: "success" | "fail";
+  distance?: number; 
+  difficulty?: number; 
+  speed?: number;
 }
 
 export interface Match {
@@ -58,16 +62,50 @@ export interface TeamStats {
   possession: number;
   passes: number;
   passAccuracy: number;
+  avgPassDistance: number;
+  hardPassesCompleted: number; 
   shots: number;
   shotsOnTarget: number;
   xG: number;
+  maxShotSpeed: number;
+  pressures: number;
+  possessionWins: number;
+  sprints: number;
+  distanceKm: number;
   fouls: number;
   corners: number;
   yellowCards: number;
   redCards: number;
 }
 
-export type KeyMomentKind = "goal" | "big_chance" | "red_card" | "momentum_shift";
+export interface PlayerStats {
+  id: string;
+  name: string;
+  team: TeamSide;
+  position: Position;
+  number: number;
+  onPitch: boolean;
+  minutes: number;
+  passes: number;
+  passAccuracy: number;
+  avgPassDistance: number;
+  hardPassesCompleted: number;
+  shots: number;
+  xG: number;
+  goals: number;
+  assists: number;
+  pressures: number;
+  tackles: number;
+  interceptions: number;
+  sprints: number;
+  topSpeed: number;
+  distanceKm: number;
+  cards: number;
+}
+
+export type KeyMomentKind =
+  | "goal" | "big_chance" | "red_card" | "momentum_shift"
+  | "pressure_shift" | "chaos" | "milestone";
 
 export interface KeyMoment {
   id: string;
@@ -77,18 +115,29 @@ export interface KeyMoment {
   title: string;
   evidence: string[]; 
   eventIds: string[];
-  importance: number; 
+  importance: number;
+  playerId?: string;
 }
 
 export interface ShotPoint {
   id: string;
   minute: number;
   team: TeamSide;
+  playerId?: string;
   player: string;
   x: number;
   y: number;
   xG: number;
+  speed: number;
   result: "goal" | "saved" | "on_target" | "off_target";
+}
+
+export interface MinutePoint {
+  minute: number;
+  momentum: number; 
+  control: number; 
+  tempo: number;
+  pressure: Record<TeamSide, number>; 
 }
 
 export interface MatchState {
@@ -96,9 +145,13 @@ export interface MatchState {
   period: "pre" | "first_half" | "half_time" | "second_half" | "full_time";
   score: Score;
   stats: Record<TeamSide, TeamStats>;
-  momentum: number; 
+  momentum: number;
   momentumSeries: number[];
+  control: number;
+  tempo: number;
+  timeline: MinutePoint[];
   keyMoments: KeyMoment[];
   shotMap: ShotPoint[];
+  players: PlayerStats[];
   recentEvents: MatchEvent[];
 }

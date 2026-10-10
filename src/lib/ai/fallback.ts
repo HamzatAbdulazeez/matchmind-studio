@@ -16,7 +16,7 @@ export function fallbackRecap(match: Match, state: MatchState): Recap {
   const a = state.stats.away;
   const goals = state.keyMoments
     .filter((k) => k.kind === "goal")
-    .map((k) => `${k.minute}' ${k.title.replace("GOAL — ", "")}`);
+    .map((k) => `${k.minute}' ${k.title.replace("GOAL: ", "")}`);
 
   return {
     title: `${home.name} ${state.score.home}-${state.score.away} ${away.name}`,
