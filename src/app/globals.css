@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+ 
+  --color-night: #0c1b26;
+  --color-deck: #12293a;
+  --color-rail: #23435a;
+  --color-chalk: #eef1ea;
+  --color-mist: #98adbd;
+
+  /* Pitch */
+  --color-turf: #1d5a38;
+  --color-turf-2: #22663f;
+
+  /* Broadcast signals */
+  --color-tally: #ef3e2c;
+  --color-gold: #f4c13d;
+
+  /* Teams */
+  --color-home: #ff5c72;
+  --color-away: #59b6ff;
+
+  /* Matchday programme (recaps) */
+  --color-paper: #fbfbf8;
+  --color-ink: #13212b;
+
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", ui-sans-serif, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-night);
+  color: var(--color-chalk);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+select option {
+  background: var(--color-deck);
+  color: var(--color-chalk);
+}
+
+/* The one big moment: the score changes */
+@keyframes score-flash {
+  0% { color: var(--color-gold); transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.score-flash {
+  display: inline-block;
+  animation: score-flash 1.4s ease-out;
+}
+
+/* Latest shot on the pitch */
+@keyframes shot-pulse {
+  from { transform: scale(0.6); opacity: 0.9; }
+  to { transform: scale(1.9); opacity: 0; }
+}
+.shot-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shot-pulse 1.6s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .score-flash,
+  .shot-pulse,
+  .animate-pulse {
+    animation: none;
+  }
+}
