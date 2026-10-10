@@ -203,7 +203,7 @@ export function EventFeed({ meta, events }: { meta: MatchMeta; events: MatchEven
       {events.length === 0 ? (
         <p className="text-sm text-mist">Events appear here once the match starts.</p>
       ) : (
-        <ul className="max-h-[32rem] divide-y divide-rail/60 overflow-y-auto pr-1">
+        <ul className="max-h-128 divide-y divide-rail/60 overflow-y-auto pr-1">
           {events.map((e) => (
             <li key={e.id} className="flex items-start gap-3 py-2 text-sm">
               <span className="w-8 shrink-0 font-display tabular-nums text-mist">{e.minute}&apos;</span>
